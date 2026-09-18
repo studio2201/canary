@@ -1,0 +1,35 @@
+{
+  "org_meta": { "org": "canary-org" },
+  "repos": [
+    {
+      "name": "canary-legacy-service",
+      "is_public": true,
+      "days_dormant": 1200,
+      "dependency_count": 95,
+      "recent_bot_commit_pct": 0.95,
+      "active_contributors_180d": 0,
+      "unpinned_dependencies": 24,
+      "notes": "Critical tech-debt monolith abandoned for over 3 years"
+    },
+    {
+      "name": "canary-abandoned-worker",
+      "is_public": true,
+      "days_dormant": 850,
+      "dependency_count": 65,
+      "recent_bot_commit_pct": 0.85,
+      "active_contributors_180d": 0,
+      "unpinned_dependencies": 16,
+      "notes": "High tech-debt worker with extreme bot drift"
+    },
+    {
+      "name": "canary-active-gateway",
+      "is_public": false,
+      "days_dormant": 30,
+      "dependency_count": 20,
+      "recent_bot_commit_pct": 0.10,
+      "active_contributors_180d": 5,
+      "unpinned_dependencies": 0,
+      "notes": "Maintained active baseline service"
+    }
+  ]
+}

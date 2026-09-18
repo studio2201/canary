@@ -1,0 +1,6 @@
+# studio2201 Boneyard Tech-Debt Governance Policy
+# Canary reference repository intentional breach configuration
+
+max_avg_boneyard_index = 50.0
+max_critical_repos = 0
+max_remediation_weeks = 15.0

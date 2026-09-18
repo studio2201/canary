@@ -1,0 +1,11 @@
+{
+  "name": "canary-vigil-fixture",
+  "version": "1.0.0",
+  "description": "Canary failure fixture: Abandoned and dormant supply-chain dependencies",
+  "private": true,
+  "dependencies": {
+    "colors": "^1.4.0",
+    "nom": "^7.1.3",
+    "request": "^2.88.2"
+  }
+}

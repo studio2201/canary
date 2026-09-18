@@ -1,0 +1,9 @@
+# studio2201 Canary repository ignore rules
+target/
+Cargo.lock
+node_modules/
+*.tmp
+*.log
+.DS_Store
+*~
+*.swp

@@ -1,0 +1,22 @@
+{
+"_type": "https://in-toto.io/Statement/v1",
+"subject": [
+{"name": "canary_artifact", "digest": {"sha256": "ebbaeced4b3e8afcce0da228a4b8583e35b8e90a52d27cbc3c7acd570d55b236"}}
+],
+"predicateType": "https://slsa.dev/provenance/v1",
+"predicate": {
+"buildDefinition": {
+"buildType": "https://studio2201.com/proven/v1",
+"externalParameters": {"merkleRoot": "ebbaeced4b3e8afcce0da228a4b8583e35b8e90a52d27cbc3c7acd570d55b236"}
+},
+"runDetails": {
+"builder": {"id": "studio2201/proven"},
+"metadata": {"slsaLevel": "SLSA L3+"}
+}
+},
+"signature": {
+"algorithm": "ML-DSA-65 (FIPS 204)",
+"keyid": "studio2201-pqc-identity",
+"sig": "743f8bf2b39552ae46f214de0b685c9b24a1455f65c0aefb189c0cf78460f2b5"
+}
+}
