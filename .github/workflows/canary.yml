@@ -1,0 +1,66 @@
+name: Canary Failure Testbed
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary-testbed:
+    name: studio2201 Canary Failure Testbed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify Line Count Doctrine (<= 256 LOC)
+        run: |
+          echo "==> Auditing repository files for <= 256 LOC doctrine..."
+          violations=0
+          while IFS= read -r file; do
+            [ -f "$file" ] || continue
+            lines=$(wc -l < "$file")
+            if [ "$lines" -gt 256 ]; then
+              echo "::error file=$file,line=$lines::File exceeds 256 LOC: $lines"
+              violations=$((violations + 1))
+            fi
+          done < <(find . -type f ! -path './.git/*')
+
+          if [ "$violations" -gt 0 ]; then
+            echo "ERROR: $violations file(s) exceed 256 LOC doctrine." >&2
+            exit 1
+          fi
+          echo "PASS: All files comply with <= 256 LOC doctrine."
+
+      - name: Install studio2201 Suite
+        run: |
+          echo "==> Installing studio2201 tools via universal installer..."
+          curl -fsSL --retry 3 --retry-delay 2 \
+            https://studio2201.com/install.sh | sh -s all
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Tool Installation
+        run: |
+          echo "==> Verifying installed tools in PATH..."
+          for tool in snip vigil aegis proven boneyard; do
+            bin_path=$(which "$tool" 2>/dev/null || echo "NOT FOUND")
+            echo "Found $tool: $bin_path"
+            if [ "$bin_path" = "NOT FOUND" ]; then
+              echo "ERROR: $tool not found in PATH" >&2
+              exit 1
+            fi
+            "$tool" --version
+          done
+
+      - name: Run Canary Negative Failure Demonstration
+        env:
+          CI: "true"
+        run: |
+          echo "==> Executing Canary Demonstration Suite..."
+          chmod +x ./demo.sh
+          ./demo.sh
