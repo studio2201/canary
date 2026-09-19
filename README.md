@@ -1,12 +1,7 @@
 # Canary (`studio2201/canary`)
 
-[![Canary CI](https://github.com/studio2201/canary/actions/workflows/canary.yml/badge.svg?branch=master)](https://github.com/studio2201/canary/actions/workflows/canary.yml)
-[![Release](https://img.shields.io/badge/version-v0.1.2-blue.svg)](https://github.com/studio2201/canary/releases)
-[![Vibe-Safe](https://img.shields.io/badge/vibe--safe-BLOCK-red.svg)](https://studio2201.com/canary#snip)
-[![Dormancy](https://img.shields.io/badge/dormancy-CRITICAL-red.svg)](https://studio2201.com/canary#vigil)
-[![PQC](https://img.shields.io/badge/PQC-NON--COMPLIANT-red.svg)](https://studio2201.com/canary#aegis)
-[![SLSA](https://img.shields.io/badge/SLSA-TAMPERED-red.svg)](https://studio2201.com/canary#proven)
-[![Boneyard](https://img.shields.io/badge/boneyard%20index-72%2F100-red.svg)](https://studio2201.com/canary#boneyard)
+[![studio2201 Suite](https://img.shields.io/badge/studio2201-5%2F5%20Verified-2f6f5e?logo=shield)](https://studio2201.com/agents#badges)
+[![Release](https://img.shields.io/badge/version-v0.1.3-blue.svg)](https://github.com/studio2201/canary/releases)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 > Reference failure repository providing deliberate, realistic triggers across all studio2201 tools.
