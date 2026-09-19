@@ -1,8 +1,27 @@
 # Canary (`studio2201/canary`)
 
+[![Canary CI](https://github.com/studio2201/canary/actions/workflows/canary.yml/badge.svg?branch=master)](https://github.com/studio2201/canary/actions/workflows/canary.yml)
+[![Release](https://img.shields.io/badge/version-v0.1.1-blue.svg)](https://github.com/studio2201/canary/releases)
+[![Vibe-Safe](https://img.shields.io/badge/vibe--safe-BLOCK-red.svg)](https://studio2201.com/canary#snip)
+[![Dormancy](https://img.shields.io/badge/dormancy-CRITICAL-red.svg)](https://studio2201.com/canary#vigil)
+[![PQC](https://img.shields.io/badge/PQC-NON--COMPLIANT-red.svg)](https://studio2201.com/canary#aegis)
+[![SLSA](https://img.shields.io/badge/SLSA-TAMPERED-red.svg)](https://studio2201.com/canary#proven)
+[![Boneyard](https://img.shields.io/badge/boneyard%20index-72%2F100-red.svg)](https://studio2201.com/canary#boneyard)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 > Reference failure repository providing deliberate, realistic triggers across all studio2201 tools.
 
 Canary is an intentionally broken reference repository engineered for **negative testing**, continuous integration gating, and live technical demonstration of the [studio2201](https://studio2201.com) developer tools suite: **Snip**, **Vigil**, **Aegis**, **Proven**, and **Boneyard**.
+
+## Deliberate Failure Matrix
+
+| Product | Focus | Failure Badge | Expected Verdict | Fixture Target | Exit Code |
+| :--- | :--- | :--- | :---: | :--- | :---: |
+| [**Snip**](https://studio2201.com/snip) | Vibe-code security gate | [![Vibe-Safe](https://img.shields.io/badge/vibe--safe-BLOCK-red.svg)](https://studio2201.com/canary#snip) | `BLOCK` | `fixtures/snip/staged.patch` | `1` |
+| [**Vigil**](https://studio2201.com/vigil) | Supply-chain dormancy scanner | [![Dormancy](https://img.shields.io/badge/dormancy-CRITICAL-red.svg)](https://studio2201.com/canary#vigil) | `DORMANT` | `fixtures/vigil/package.json` | `1` |
+| [**Aegis**](https://studio2201.com/aegis) | PQC migration SDK & scanner | [![PQC](https://img.shields.io/badge/PQC-NON--COMPLIANT-red.svg)](https://studio2201.com/canary#aegis) | `NON-COMPLIANT` | `fixtures/aegis/legacy_crypto.rs` | `1` |
+| [**Proven**](https://studio2201.com/proven) | PQC-signed supply-chain attestor | [![SLSA](https://img.shields.io/badge/SLSA-TAMPERED-red.svg)](https://studio2201.com/canary#proven) | `TAMPERED` | `fixtures/proven/canary_artifact` | `1` |
+| [**Boneyard**](https://studio2201.com/boneyard) | Org-wide tech-debt radar | [![Boneyard](https://img.shields.io/badge/boneyard%20index-72%2F100-red.svg)](https://studio2201.com/canary#boneyard) | `DEBT BREACH` | `fixtures/boneyard/catalog.json` | `1` |
 
 ---
 
@@ -51,6 +70,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 
 ### 1. Snip — Vibe-Code Secret & SQL Safety Gate
 
+[![Vibe-Safe](https://img.shields.io/badge/vibe--safe-BLOCK-red.svg)](https://studio2201.com/canary#snip)
+
 - **Deliberate Flaw**:
   - `fixtures/snip/api_keys.ts`: Contains hardcoded Stripe live secrets (`sk_live_...`) and Anthropic API keys (`sk-ant-...`).
   - `fixtures/snip/migrations/001_create_accounts.sql`: Creates a sensitive database table without enabling PostgreSQL Row Level Security (`CREATE TABLE accounts (...)` omitting `ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;`).
@@ -75,6 +96,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 
 ### 2. Vigil — Supply-Chain Dependency Dormancy Scanner
 
+[![Dormancy](https://img.shields.io/badge/dormancy-CRITICAL-red.svg)](https://studio2201.com/canary#vigil)
+
 - **Deliberate Flaw**:
   - `fixtures/vigil/package.json`: References historically abandoned npm packages (`colors` at 561 days dormant, `nom` at 573 days, `request` at 458 days), breaching the 180-day dormancy ceiling.
 - **Inspection Command**:
@@ -96,6 +119,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 
 ### 3. Aegis — Post-Quantum Cryptography (PQC) Migration Gate
 
+[![PQC](https://img.shields.io/badge/PQC-NON--COMPLIANT-red.svg)](https://studio2201.com/canary#aegis)
+
 - **Deliberate Flaw**:
   - `fixtures/aegis/legacy_crypto.rs`: Implements classical 1024-bit RSA key generation and encryption (`RSA_generate_key(1024, ...)`, `RSA_public_encrypt`) alongside classical `secp256k1` ECDSA signatures (`ECDSA_sign`, `ES256`).
 - **Inspection Command**:
@@ -115,6 +140,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 
 ### 4. Proven — PQC-Signed Provenance & Tamper Verification
 
+[![SLSA](https://img.shields.io/badge/SLSA-TAMPERED-red.svg)](https://studio2201.com/canary#proven)
+
 - **Deliberate Flaw**:
   - `fixtures/proven/canary_artifact`: Payload signed with ML-DSA-65 into SLSA L3+ provenance predicate `fixtures/proven/attestation.json`.
   - The payload was modified by 1 byte post-attestation (`rc1` altered to `rc2`), producing a digest and Merkle root mismatch.
@@ -133,6 +160,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 ---
 
 ### 5. Boneyard — Org-Wide Technical Debt Radar
+
+[![Boneyard](https://img.shields.io/badge/boneyard%20index-72%2F100-red.svg)](https://studio2201.com/canary#boneyard)
 
 - **Deliberate Flaw**:
   - `fixtures/boneyard/catalog.json`: Service catalog containing abandoned repositories with 1,200 days dormancy, 95% unreviewed bot commits, and zero active maintainers.
