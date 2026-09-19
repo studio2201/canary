@@ -1,7 +1,7 @@
 # Canary (`studio2201/canary`)
 
 [![Canary CI](https://github.com/studio2201/canary/actions/workflows/canary.yml/badge.svg?branch=master)](https://github.com/studio2201/canary/actions/workflows/canary.yml)
-[![Release](https://img.shields.io/badge/version-v0.1.1-blue.svg)](https://github.com/studio2201/canary/releases)
+[![Release](https://img.shields.io/badge/version-v0.1.2-blue.svg)](https://github.com/studio2201/canary/releases)
 [![Vibe-Safe](https://img.shields.io/badge/vibe--safe-BLOCK-red.svg)](https://studio2201.com/canary#snip)
 [![Dormancy](https://img.shields.io/badge/dormancy-CRITICAL-red.svg)](https://studio2201.com/canary#vigil)
 [![PQC](https://img.shields.io/badge/PQC-NON--COMPLIANT-red.svg)](https://studio2201.com/canary#aegis)
@@ -25,14 +25,58 @@ Canary is an intentionally broken reference repository engineered for **negative
 
 ---
 
-## Negative Testing Philosophy
+## Why Negative CI Verification Is Critical
 
-In software security, verifying that clean code passes is only half the battle. A security linter or supply-chain gate that never fails is indistinguishable from a no-op.
+In software security, verifying that clean code passes is only half the battle. A security linter or supply-chain gate that never fails in CI provides false confidence and is indistinguishable from a no-op.
 
 Negative testing validates that defensive gates reliably detect and intercept real-world violations:
-- **Authentic Fixtures**: Flaws are modeled directly on common production mistakes—live secret patterns, unpatched supply-chain dependencies, post-quantum policy violations, corrupted build attestations, and runaway technical debt.
-- **Fail-Closed Verification**: Every tool in the suite must flag its respective defect, emit clear remediation diagnostics, and exit with code `1`.
-- **Inverted CI Success**: In automated CI, a green build indicates that all five negative tests successfully caught their deliberate defects.
+- **Authentic Fixtures**: Flaws are modeled directly on common production mistakes—live secret leaks (GitGuardian), unpatched supply-chain dependencies (CVE-2024-3094, `colors.js`), post-quantum policy violations (OMB M-26-15), corrupted build attestations (SolarWinds), and runaway technical debt.
+- **Fail-Closed Verification**: Every tool in the suite must flag its respective defect, emit actionable remediation diagnostics, and exit with code `1`.
+- **Automated Gates Beat Manual Discipline**: Developers rarely run negative sanity tests manually. Loading Canary checks into automated CI guarantees that gates never degrade into silent passes.
+
+---
+
+## Autonomous Agent Integration
+
+Deploy Canary negative verification into CI using an AI coding assistant or copy the workflow below.
+
+### Prompt for your AI Agent
+
+Copy and paste this prompt to Cursor, Claude Code, Copilot Workspace, or Devin:
+
+```text
+Add a GitHub Actions workflow to this repository at .github/workflows/canary.yml that executes the Canary negative testbed (./demo.sh) on every push and pull request. The workflow must assert that all 5 studio2201 security tools correctly intercept their deliberate failure fixtures and exit with code 1, verifying fail-closed enforcement.
+```
+
+### GitHub Actions Workflow
+
+Commit this workflow at `.github/workflows/canary.yml`:
+
+```yaml
+name: Canary Failure Testbed
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+permissions:
+  contents: read
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run studio2201 Suite Gate
+        uses: studio2201/studio2201@master
+        with:
+          tools: 'all'
+          fail-on: 'block'
+        continue-on-error: true
+      - name: Execute Canary Verification
+        run: |
+          curl -fsSL https://studio2201.com/install.sh | sh -s all
+          ./demo.sh
+```
 
 ---
 
@@ -45,7 +89,7 @@ Canary provides `./demo.sh` to execute the full negative verification suite in a
 ```
 
 ### Script Execution & Discovery
-`demo.sh` automatically locates compiled binaries via `STUDIO2201_BIN_DIR`, sibling workspaces (`../studio2201/*/target/release`), `~/.local/bin`, or `$PATH`. It evaluates each tool against its fixture, asserts exit code `1`, and displays a 76-column colorized scorecard:
+`demo.sh` automatically locates compiled binaries via `STUDIO2201_BIN_DIR`, sibling workspaces, `~/.local/bin`, or `$PATH`. It evaluates each tool against its fixture, asserts exit code `1`, and displays a concise verification scorecard:
 
 ```text
 +----------+--------------------------+-----+-----+---------------+--------+
@@ -57,12 +101,10 @@ Canary provides `./demo.sh` to execute the full negative verification suite in a
 | proven   | proven/canary_artifact   |  1  |  1  | TAMPERED      |  PASS  |
 | boneyard | boneyard/catalog.json    |  1  |  1  | DEBT BREACH   |  PASS  |
 +----------+--------------------------+-----+-----+---------------+--------+
-
 ✓ ALL 5 CHECKS PASSED: All tools failed with exit code 1 as expected.
-Canary negative verification succeeded.
 ```
 
-The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure clean scriptability in automation.
+The script supports `NO_COLOR=1` and detects non-interactive pipes for automation.
 
 ---
 
@@ -74,7 +116,7 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 
 - **Deliberate Flaw**:
   - `fixtures/snip/api_keys.ts`: Contains hardcoded Stripe live secrets (`sk_live_...`) and Anthropic API keys (`sk-ant-...`).
-  - `fixtures/snip/migrations/001_create_accounts.sql`: Creates a sensitive database table without enabling PostgreSQL Row Level Security (`CREATE TABLE accounts (...)` omitting `ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;`).
+  - `fixtures/snip/migrations/001_create_accounts.sql`: Creates a sensitive database table without enabling PostgreSQL Row Level Security.
   - `fixtures/snip/staged.patch`: Unified git diff staging both violations.
 - **Inspection Command**:
   ```bash
@@ -82,13 +124,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
   ```
 - **Terminal Failure Output (`BLOCK`, exit 1)**:
   ```text
-  snip verdict: BLOCK
-  findings: 3
-    [CRITICAL] fixtures/snip/api_keys.ts:12 — Hardcoded Stripe Production Secret Key
-    [CRITICAL] fixtures/snip/api_keys.ts:13 — Hardcoded OpenAI / LLM API Key
-    [HIGH] fixtures/snip/migrations/001_create_accounts.sql:1 — Table created in SQL migration without enabling Row Level Security
-    blocked: Critical finding threshold exceeded: 2 detected (max 0)
-    blocked: High severity finding threshold exceeded: 1 detected (max 0)
+  snip verdict: BLOCK (exit code 1)
+  findings: 2 CRITICAL secrets (Stripe/OpenAI), 1 HIGH migration (missing RLS)
   ```
 - **Rationale**: Prevents accidental leakage of live payment credentials and API keys in commit history. Enforces strict multi-tenant isolation by blocking un-RLS database migrations.
 
@@ -106,12 +143,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
   ```
 - **Terminal Failure Output (`DORMANT`, exit 1)**:
   ```text
-  vigil policy check: FAILED
-    - Critical dependencies count 3 exceeds threshold 0
-    - Average risk score 98.4 exceeds threshold 45.0
-    - Dependency 'colors' (561 days dormant) exceeds max dormancy of 180 days
-    - Dependency 'nom' (573 days dormant) exceeds max dormancy of 180 days
-    - Dependency 'request' (458 days dormant) exceeds max dormancy of 180 days
+  vigil policy check: FAILED (exit code 1)
+  Critical dependencies: colors (561d), nom (573d), request (458d) > 180d
   ```
 - **Rationale**: Mitigates software supply-chain takeovers. Long-abandoned upstream dependencies harbor unpatched vulnerabilities and are frequent targets of malicious maintainer transfers.
 
@@ -122,19 +155,17 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
 [![PQC](https://img.shields.io/badge/PQC-NON--COMPLIANT-red.svg)](https://studio2201.com/canary#aegis)
 
 - **Deliberate Flaw**:
-  - `fixtures/aegis/legacy_crypto.rs`: Implements classical 1024-bit RSA key generation and encryption (`RSA_generate_key(1024, ...)`, `RSA_public_encrypt`) alongside classical `secp256k1` ECDSA signatures (`ECDSA_sign`, `ES256`).
+  - `fixtures/aegis/legacy_crypto.rs`: Implements classical 1024-bit RSA key generation and encryption alongside classical `secp256k1` ECDSA signatures.
 - **Inspection Command**:
   ```bash
   aegis policy check fixtures/aegis/legacy_crypto.rs
   ```
 - **Terminal Failure Output (`NON-COMPLIANT`, exit 1)**:
   ```text
-  aegis policy check: FAILED
-    - Policy strictly prohibits RSA past 2030 (found 4 call sites)
-    - Policy prohibits classical ECC algorithms without PQC encapsulation (found 6 call sites)
-    - Total legacy cryptographic sites 10 exceeds policy cap 0
+  aegis policy check: FAILED (exit code 1)
+  Legacy sites: 4 RSA call sites, 6 classical ECC call sites (exceeds cap 0)
   ```
-- **Rationale**: Enforces compliance with OMB M-26-15 and NIST FIPS 203/204 mandates. Cryptanalytically relevant quantum computers (CRQCs) threaten classical public-key cryptography via "harvest now, decrypt later" attacks.
+- **Rationale**: Enforces compliance with OMB M-26-15 and NIST FIPS 203/204 mandates against "harvest now, decrypt later" attacks.
 
 ---
 
@@ -151,9 +182,8 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
   ```
 - **Terminal Failure Output (`TAMPERED`, exit 1)**:
   ```text
-  proven verification: FAILED
-    ✗ SHA-256 mismatch! Artifact=6ea18a..., Attestation=ebbaec...
-    ✗ Merkle root mismatch! Re-derived=6ea18a..., Attestation=ebbaec...
+  proven verification: FAILED (exit code 1)
+  ✗ SHA-256 and Merkle root mismatch against ML-DSA-65 attestation
   ```
 - **Rationale**: Verifies binary and build-artifact supply-chain integrity. Disallows execution or deployment of any artifact that diverges from its cryptographically attested provenance.
 
@@ -172,25 +202,10 @@ The script supports `NO_COLOR=1` and detects non-interactive pipes to ensure cle
   ```
 - **Terminal Failure Output (`DEBT BREACH`, exit 1)**:
   ```text
-  boneyard policy check: FAILED
-    - Org average Boneyard Index 72.0 exceeds maximum allowed 50.0
-    - Critical repository count 2 exceeds threshold 0
+  boneyard policy check: FAILED (exit code 1)
+  Average Boneyard Index 72.0 > max 50.0 | 2 critical repositories > 0
   ```
-- **Rationale**: Architectural tech-debt governance. Prevents accumulation of unmaintained "zombie" services and unpinned dependencies that degrade engineering velocity and create security blindspots.
-
----
-
-## Continuous Integration (`.github/workflows/canary.yml`)
-
-Canary runs automated negative regression gating on GitHub Actions for pushes and pull requests to `master`:
-
-1. **Doctrine Check**: Validates the studio2201 governance rule that all files remain $\le 256$ lines of code.
-2. **Suite Installation**: Fetches and installs the latest studio2201 binaries via:
-   ```bash
-   curl -fsSL https://studio2201.com/install.sh | sh -s all
-   ```
-3. **Negative Testbed Execution**: Executes `./demo.sh`, ensuring all 5 tools correctly reject their deliberate fixtures with exit code `1`.
-4. **CI Assertion**: The workflow passes (`exit 0`) if and only if all negative assertions are satisfied.
+- **Rationale**: Architectural tech-debt governance. Prevents accumulation of unmaintained services that degrade engineering velocity and create security blindspots.
 
 ---
 
